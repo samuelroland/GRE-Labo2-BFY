@@ -1,5 +1,5 @@
 /*
- * Authors: Samuel Roland, Julien Mühlemann, Simon Menicot
+ * Authors: Samuel Roland, Simon Menicot
  */
 package gre.lab2.groupK;
 
