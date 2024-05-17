@@ -55,25 +55,29 @@ public final class BellmanFordYensAlgorithm implements IBellmanFordYensAlgorithm
                         // If the last iteration brought some amelioration, we have to look for
                         // the absorbent circuit
                         if (lastIteration) {
-                            // List<Integer> stack = new LinkedList<Integer>();
-                            // stack(first);
-                            // int i = first;
-                            // while (!stack.contains(preds[i])) {
-                            // stack.push(preds[i]);
-                            // i = preds[i];
-                            // }
-                            // TODO: implement boolean array to O(M) (M is number of discovery vertices)
+                            List<Integer> circuitVertices = new LinkedList<>();
+                            boolean[] foundVertices = new boolean[nVertices];
+                            foundVertices[first] = true;
+                            circuitVertices.addFirst(first);
+                            int i = first;
+                            while (!foundVertices[preds[i]]) {
+                                circuitVertices.addFirst(preds[i]);
+                                foundVertices[preds[i]] = true;
+                                i = preds[i];
+                            }
+                            // TODO: implement boolean array to O(N) (M is number of discovery vertices)
                             //TODO: ask assistant if okay to put time complexity before spatial complexity
-                            // while(stack.)
-                            // List<Integer> circuitVertices =
-                            // return new BFYResult.NegativeCycle();
+                            // TODO: add weight
+                            while(circuitVertices.getLast() != preds[i]){
+                                circuitVertices.removeLast();
+                            }
+
+                            return new BFYResult.NegativeCycle(circuitVertices, 0);
 
                         }
 
                         if (!verticesQueue.contains(to))
                             verticesQueue.addFirst(to);
-                    } else if (lastIteration) {
-                        return new BFYResult.ShortestPathTree(distsTo, preds);
                     }
                 }
             }
