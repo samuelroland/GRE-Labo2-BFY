@@ -20,6 +20,7 @@ public final class BellmanFordYensAlgorithm implements IBellmanFordYensAlgorithm
         int nVertices = graph.getNVertices();
         int[] distsTo = new int[nVertices]; // distance from the source to vertex i
         int[] preds = new int[nVertices]; // predecessor of vertex i
+        boolean[] contains = new boolean[nVertices];
 
         Arrays.fill(distsTo, Integer.MAX_VALUE);
         Arrays.fill(preds, -1);
@@ -32,19 +33,21 @@ public final class BellmanFordYensAlgorithm implements IBellmanFordYensAlgorithm
         // Add the source and sentinelle in the queue for the first iteration
         verticesQueue.addFirst(from);
         verticesQueue.addFirst(SENTINEL);
+        contains[from] = true;
         boolean lastIteration = false;
         while (!verticesQueue.isEmpty()) {
             int first = verticesQueue.removeLast(); // TODO: or .remove() ?
             if (first == SENTINEL) {
                 if (!verticesQueue.isEmpty()) {
 
-                    if (iterationCount++ == nVertices) {
+                    if (iterationCount++ == nVertices) { //TODO: iter++ or ++iter ?
                         lastIteration = true;
                     } else {
                         verticesQueue.addFirst(SENTINEL);
                     }
                 }
             } else {
+                contains[first] = false;
                 for (Edge outgoingEdge : graph.getOutgoingEdges(first)) {
                     int newDistance = distsTo[first] + outgoingEdge.weight();
                     int to = outgoingEdge.to();
@@ -87,8 +90,10 @@ public final class BellmanFordYensAlgorithm implements IBellmanFordYensAlgorithm
 
                         }
 
-                        if (!verticesQueue.contains(to))
+                        if (!contains[to]) {
+                            contains[to] = true;
                             verticesQueue.addFirst(to);
+                        }
                     }
                 }
             }
