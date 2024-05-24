@@ -14,9 +14,12 @@ import gre.lab2.graph.WeightedDigraph;
 import gre.lab2.graph.WeightedDigraph.Edge;
 
 public final class BellmanFordYensAlgorithm implements IBellmanFordYensAlgorithm {
+    static final int SENTINEL = -1; // sentinel value in the queue
+    static final int VIEWED = -2; // to put in preds when the vertex is found
+
     @Override
     public BFYResult compute(WeightedDigraph graph, int from) {
-        int SENTINEL = -1; // sentinel value in the queue
+
         int nVertices = graph.getNVertices();
         int[] distsTo = new int[nVertices]; // distance from the source to vertex i
         int[] preds = new int[nVertices]; // predecessor of vertex i
@@ -40,7 +43,7 @@ public final class BellmanFordYensAlgorithm implements IBellmanFordYensAlgorithm
             if (first == SENTINEL) {
                 if (!verticesQueue.isEmpty()) {
 
-                    if (iterationCount++ == nVertices) { //TODO: iter++ or ++iter ?
+                    if (iterationCount++ == nVertices) { // TODO: iter++ or ++iter ?
                         lastIteration = true;
                     } else {
                         verticesQueue.addFirst(SENTINEL);
@@ -59,7 +62,6 @@ public final class BellmanFordYensAlgorithm implements IBellmanFordYensAlgorithm
                         // the absorbent circuit
                         if (lastIteration) {
                             // we now use preds to look for the absorbant circuit
-                            int VIEWED = -2; // to put in preds when the vertex is found
                             List<Integer> circuitVertices = new LinkedList<>();
                             int pred = preds[first]; // we need to store preds[i] as it is overwritten
                             int i = first;
@@ -68,19 +70,19 @@ public final class BellmanFordYensAlgorithm implements IBellmanFordYensAlgorithm
                                 preds[i] = VIEWED;
                                 i = pred;
                                 pred = preds[i];
-                                distsTo[pred] = i; //we use distsTo to store the successors of the vertexes found
+                                distsTo[pred] = i; // we use distsTo to store the successors of the vertexes found
                             }
                             // TODO: implement boolean array to O(N) (M is number of discovery vertices)
                             // TODO: ask assistant if okay to put time complexity before spatial complexity
                             // TODO: add weight
-                            while(circuitVertices.getLast() != pred){
+                            while (circuitVertices.getLast() != pred) {
                                 circuitVertices.removeLast();
                             }
 
                             int weight = 0;
                             for (int vertex : circuitVertices) {
-                                for (Edge outEdge : graph.getOutgoingEdges(vertex)){
-                                    if (outEdge.to() == distsTo[vertex]){
+                                for (Edge outEdge : graph.getOutgoingEdges(vertex)) {
+                                    if (outEdge.to() == distsTo[vertex]) {
                                         weight += outEdge.weight();
                                     }
                                 }
