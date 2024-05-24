@@ -21,7 +21,10 @@ public final class Main {
 
             var result = algo.compute(graph, DEFAULT_SOURCE);
 
-            System.out.println(result);
+            if (result.isNegativeCycle() || graph.getNVertices() < 25)
+                System.out.println(result + "\n");
+            else
+                System.out.println("Le réseau " + i + " possède une arborescence de plus court chemin.\n");
 
         }
         // TODO
