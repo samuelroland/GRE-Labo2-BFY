@@ -55,24 +55,37 @@ public final class BellmanFordYensAlgorithm implements IBellmanFordYensAlgorithm
                         // If the last iteration brought some amelioration, we have to look for
                         // the absorbent circuit
                         if (lastIteration) {
+                            // we now use preds to look for the absorbant circuit
+                            int VIEWED = -2; // to put in preds when the vertex is found
                             List<Integer> circuitVertices = new LinkedList<>();
-                            boolean[] foundVertices = new boolean[nVertices];
-                            foundVertices[first] = true;
+                            int pred = preds[first]; // we need to store preds[i] as it is overwritten
+                            preds[first] = VIEWED;
                             circuitVertices.addFirst(first);
                             int i = first;
-                            while (!foundVertices[preds[i]]) {
-                                circuitVertices.addFirst(preds[i]);
-                                foundVertices[preds[i]] = true;
-                                i = preds[i];
+                            while (pred != VIEWED) {
+                                circuitVertices.addFirst(pred);
+                                preds[i] = VIEWED;
+                                i = pred;
+                                pred = preds[i];
+                                distsTo[pred] = i; //we use distsTo to store the successors of the vertexes found
                             }
                             // TODO: implement boolean array to O(N) (M is number of discovery vertices)
-                            //TODO: ask assistant if okay to put time complexity before spatial complexity
+                            // TODO: ask assistant if okay to put time complexity before spatial complexity
                             // TODO: add weight
-                            while(circuitVertices.getLast() != preds[i]){
+                            while(circuitVertices.getLast() != pred){
                                 circuitVertices.removeLast();
                             }
 
-                            return new BFYResult.NegativeCycle(circuitVertices, 0);
+                            int weight = 0;
+                            for (int vertex : circuitVertices) {
+                                for (Edge outEdge : graph.getOutgoingEdges(vertex)){
+                                    if (outEdge.to() == distsTo[vertex]){
+                                        weight += outEdge.weight();
+                                    }
+                                }
+                            }
+
+                            return new BFYResult.NegativeCycle(circuitVertices, weight);
 
                         }
 
