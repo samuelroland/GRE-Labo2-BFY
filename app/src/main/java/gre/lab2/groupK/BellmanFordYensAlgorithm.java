@@ -59,10 +59,8 @@ public final class BellmanFordYensAlgorithm implements IBellmanFordYensAlgorithm
                             int VIEWED = -2; // to put in preds when the vertex is found
                             List<Integer> circuitVertices = new LinkedList<>();
                             int pred = preds[first]; // we need to store preds[i] as it is overwritten
-                            preds[first] = VIEWED;
-                            circuitVertices.addFirst(first);
                             int i = first;
-                            while (pred != VIEWED) {
+                            while (preds[pred] != VIEWED) {
                                 circuitVertices.addFirst(pred);
                                 preds[i] = VIEWED;
                                 i = pred;
