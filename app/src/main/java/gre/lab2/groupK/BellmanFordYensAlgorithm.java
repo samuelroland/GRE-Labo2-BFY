@@ -33,7 +33,6 @@ public final class BellmanFordYensAlgorithm implements IBellmanFordYensAlgorithm
         int nVertices = graph.getNVertices();
         int[] distsTo = new int[nVertices]; // array of distance from the source to vertex i
         int[] preds = new int[nVertices]; // array of predecessor of vertex i
-        // TODO: check container and default capacity
         ArrayDeque<Integer> verticesQueue = new ArrayDeque<>(); // queue of vertices to consider at the next iteration.
                                                                 // We push values at front (addFirst()) and pop values
                                                                 // at back (removeLast())
@@ -81,44 +80,7 @@ public final class BellmanFordYensAlgorithm implements IBellmanFordYensAlgorithm
                         // If the last iteration brought some amelioration, we have to look for
                         // the absorbent circuit
                         if (lastIteration) {
-                            // Note: We now recycle the preds array to store the special VIEWED value to
-                            // indicate we met the vertex when going back in predecessor's path, so we can
-                            // know when we met the circuit entering vertex
-
-                            // Note: Like preds, we now recycle the distsTo array to store the successor, so
-                            // we can
-                            // easily find back the correct outgoing edge when doing the sum of weights
-
-                            // The final list of vertices in the absorbant circuit
-                            List<Integer> circuitVertices = new LinkedList<>();
-
-                            int pred = preds[cVertex]; // we need to store preds[i] as it will be overwritten after
-                            int i = cVertex;
-                            while (preds[pred] != VIEWED) {
-                                circuitVertices.addFirst(pred);
-                                preds[i] = VIEWED;
-                                i = pred;
-                                pred = preds[i];
-                                distsTo[pred] = i; // we use distsTo to store the successors of the vertexes found
-                            }
-                            // Remove the vertices out of the circuit (the first vertex with improvement is
-                            // not necessarily inside the circuit)
-                            while (circuitVertices.getLast() != pred) {
-                                circuitVertices.removeLast();
-                            }
-
-                            // Afterwards, compute the weight of the absorbant circuit
-                            int weight = 0;
-                            for (int vertex : circuitVertices) {
-                                for (Edge outEdge : graph.getOutgoingEdges(vertex)) {
-                                    if (outEdge.to() == distsTo[vertex]) { // this is where we are reusing distsTo as
-                                                                           // successor number
-                                        weight += outEdge.weight();
-                                    }
-                                }
-                            }
-
-                            return new BFYResult.NegativeCycle(circuitVertices, weight);
+                            return searchAbsorbentCircuit(graph, preds, cVertex, distsTo);
                         }
 
                         // add the new vertex in verticesQueue if it is not
@@ -132,5 +94,49 @@ public final class BellmanFordYensAlgorithm implements IBellmanFordYensAlgorithm
         }
 
         return new BFYResult.ShortestPathTree(distsTo, preds);
+    }
+
+    private BFYResult.NegativeCycle searchAbsorbentCircuit(WeightedDigraph graph, int preds[], int cVertex,
+            int distsTo[]) {
+        // Note: We now recycle the preds array to store the special VIEWED value to
+        // indicate that we met the vertex when going back in predecessor's path, so we
+        // can know when we met the circuit entering vertex
+
+        // Note: Like preds, we now recycle the distsTo array to store the successor, so
+        // we can easily find back the correct outgoing edge when doing the sum of
+        // weights
+
+        // The final list of vertices in the absorbent circuit
+        List<Integer> circuitVertices = new LinkedList<>();
+
+        int pred = preds[cVertex]; // we need to store preds[i] as it will be overwritten after
+        int i = cVertex;
+        // Going back in predecessor until we find the same vertex twice (that would
+        // closing the loop)
+        while (preds[pred] != VIEWED) {
+            circuitVertices.addFirst(pred);
+            preds[i] = VIEWED;
+            i = pred;
+            pred = preds[i];
+            distsTo[pred] = i; // we use distsTo to store the successors of the vertexes found
+        }
+        // Remove the vertices out of the circuit (the first vertex with improvement is
+        // not necessarily inside the circuit)
+        while (circuitVertices.getLast() != pred) {
+            circuitVertices.removeLast();
+        }
+
+        // Afterwards, compute the weight of the absorbent circuit
+        int weight = 0;
+        for (int vertex : circuitVertices) {
+            for (Edge outEdge : graph.getOutgoingEdges(vertex)) {
+                if (outEdge.to() == distsTo[vertex]) { // this is where we are reusing distsTo as
+                                                       // successor number
+                    weight += outEdge.weight();
+                }
+            }
+        }
+
+        return new BFYResult.NegativeCycle(circuitVertices, weight);
     }
 }
