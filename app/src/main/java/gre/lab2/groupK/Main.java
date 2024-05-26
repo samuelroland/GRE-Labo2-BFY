@@ -8,7 +8,7 @@ import gre.lab2.graph.*;
 import java.io.IOException;
 
 public final class Main {
-    static final int DEFAULT_SOURCE = 0; // default source for the algorithm
+    static final int DEFAULT_SOURCE = 0; // default source vertex for the algorithm
     static final int FILE_COUNT = 4; // number of files to work on
 
     /**
@@ -29,17 +29,14 @@ public final class Main {
 
             var result = algo.compute(graph, DEFAULT_SOURCE);
 
-            if (result.isNegativeCycle() || graph.getNVertices() < 25) // condition to write the result of the algorithm
+            // write the result of the algorithm if we found a negative circle or we don't
+            // have too much vertices
+            if (result.isNegativeCycle() || graph.getNVertices() < 25)
                 System.out.println(result + "\n");
             else
-                System.out.println("Le réseau " + i + " possède une arborescence de plus court chemin.\n"); //default message
+                System.out.println("Le réseau " + i + " possède une arborescence de plus court chemin.\n"); // default
+                                                                                                            // message
 
         }
-        // TODO
-        // - Renommage du package ;
-        // - Écrire le code dans le package de votre groupe et UNIQUEMENT celui-ci ;
-        // - Documentation soignée comprenant :
-        // - la javadoc, avec auteurs et description des implémentations ;
-        // - des commentaires sur les différentes parties de vos algorithmes.
     }
 }
